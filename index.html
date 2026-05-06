@@ -163,7 +163,7 @@
     <h2>Architecture</h2>
     <ul>
       <li><strong>Catalog</strong>: ~25,000 products imported from TCGCSV (TCGplayer mirror), filtered to ≥$1 modern / ≥$5 vintage</li>
-      <li><strong>Source layer</strong>: ~11 polling adapters (eBay) running every 60s</li>
+      <li><strong>Source layer</strong>: ~11 polling adapters (mainly eBay) running every 60s</li>
       <li><strong>Matching</strong>: multi-tier resolver (UPC → TCGplayer ID → set+name+number+variant → fuzzy)</li>
       <li><strong>Pricing</strong>: source-aggregator pattern with mean/min/max strategies; Collectr would slot in alongside JustTCG/TCGplayer/eBay-sold</li>
       <li><strong>Alerts</strong>: Discord webhook with tier-routed notifications (must-buy / high / digest / quiet)</li>
