@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TCG Drop Bot — Personal trading-card deal hunter</title>
+  <meta name="description" content="A self-hosted Discord + web app that monitors trading-card retailers and marketplaces for restocks and deals. Personal use only.">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-card: #1e293b;
+      --text: #e2e8f0;
+      --text-muted: #94a3b8;
+      --accent: #ef4444;
+      --accent-2: #3b82f6;
+      --border: #334155;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      margin: 0 0 0.5rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    h2 {
+      font-size: 1.3rem;
+      margin: 2.5rem 0 0.75rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+    }
+    h3 {
+      font-size: 1rem;
+      margin: 1.5rem 0 0.5rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin: 0 0 2rem;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+    }
+    .card.accent {
+      border-left: 3px solid var(--accent);
+    }
+    .card.info {
+      border-left: 3px solid var(--accent-2);
+    }
+    code {
+      background: rgba(255,255,255,0.06);
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
+      font-size: 0.9em;
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+    }
+    a {
+      color: var(--accent-2);
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+    ul { padding-left: 1.5rem; }
+    li { margin: 0.4rem 0; }
+    .pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin: 1rem 0;
+    }
+    .pill {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.25rem 0.8rem;
+      font-size: 0.85em;
+      color: var(--text-muted);
+    }
+    .footer {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.9em;
+    }
+    .key-value {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0.5rem 1rem;
+      margin: 0.5rem 0;
+    }
+    .key-value dt {
+      color: var(--text-muted);
+      font-size: 0.9em;
+    }
+    .key-value dd {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <h1>🎴 TCG Drop Bot</h1>
+    <p class="tagline">A self-hosted personal deal-hunter for trading cards.</p>
+
+    <div class="pills">
+      <span class="pill">Self-hosted</span>
+      <span class="pill">Personal use</span>
+      <span class="pill">Python · FastAPI · Discord</span>
+      <span class="pill">SQLite</span>
+      <span class="pill">Pokemon TCG · One Piece TCG</span>
+    </div>
+
+    <div class="card info">
+      <strong>What this is:</strong> A Discord bot + web dashboard that monitors major TCG retailers (Best Buy, Walmart, Target, Pokemon Center) and marketplaces (eBay, TCGplayer, Shopify shops) for restocks and below-market deals. Runs 24/7 on a personal home server. Used by one person.
+    </div>
+
+    <h2>Why I'm requesting Collectr API access</h2>
+    <p>
+      Collectr aggregates pricing for sealed and graded TCG products with strong coverage of Pokemon (English + Japanese) and One Piece — including Pokemon Center exclusives, Japanese-set cards, and graded slabs that are underrepresented in TCGplayer-only data sources. As a co-primary pricing source alongside TCGplayer/JustTCG, Collectr would let me:
+    </p>
+    <ul>
+      <li><strong>Cross-validate market prices</strong> — when sources agree, the bot fires high-confidence alerts; when they diverge, it flags listings for manual review instead of mis-alerting.</li>
+      <li><strong>Cover Pokemon Center exclusives + Japanese sealed</strong> — these are the products with the thinnest TCGplayer-only data and the fastest sellouts at retail.</li>
+      <li><strong>Track condition tiers</strong> — Collectr's condition coverage helps separate NM-only deals from LP/MP listings that are already discounted.</li>
+    </ul>
+
+    <h2>Usage profile</h2>
+    <dl class="key-value">
+      <dt>Volume</dt>
+      <dd>~1,000–3,000 price lookups per day across ~25,000 catalog products</dd>
+      <dt>Pattern</dt>
+      <dd>Mostly nightly batch refresh + ad-hoc lookups when the bot detects a candidate listing</dd>
+      <dt>Caching</dt>
+      <dd>SQLite price-snapshot cache; 12-hour TTL by default to minimize repeat calls</dd>
+      <dt>Concurrency</dt>
+      <dd>Single home-server instance, ≤1 request/second to any source</dd>
+      <dt>Coverage scope</dt>
+      <dd>Pokemon (English + Japanese) and One Piece TCG — sealed and singles</dd>
+    </dl>
+
+    <h2>Architecture</h2>
+    <ul>
+      <li><strong>Catalog</strong>: ~25,000 products imported from TCGCSV (TCGplayer mirror), filtered to ≥$1 modern / ≥$5 vintage</li>
+      <li><strong>Source layer</strong>: ~11 polling adapters (eBay) running every 60s</li>
+      <li><strong>Matching</strong>: multi-tier resolver (UPC → TCGplayer ID → set+name+number+variant → fuzzy)</li>
+      <li><strong>Pricing</strong>: source-aggregator pattern with mean/min/max strategies; Collectr would slot in alongside JustTCG/TCGplayer/eBay-sold</li>
+      <li><strong>Alerts</strong>: Discord webhook with tier-routed notifications (must-buy / high / digest / quiet)</li>
+    </ul>
+
+    <h2>Source code &amp; transparency</h2>
+    <p>
+      The bot is a personal project, not commercial. There is no public service, no resale of pricing data, no third-party access. All Collectr API calls would be made server-side from a single home IP, with the bot caching responses locally to minimize repeated calls.
+    </p>
+    <p>
+      Happy to share architecture docs or a redacted code excerpt on request — please reach out via the contact below.
+    </p>
+
+    <h2>Contact</h2>
+    <div class="card">
+      <p style="margin:0">
+        <strong>Owner:</strong> jackdrioux<br>
+        <strong>Email:</strong> <a href="mailto:jackdrioux@gmail.com">jackdrioux@gmail.com</a><br>
+        <strong>Use case:</strong> personal — single home server, single user
+      </p>
+    </div>
+
+    <div class="footer">
+      <p>This is a personal landing page describing the TCG Drop Bot project. The bot itself runs locally and is not publicly accessible. This page exists to give partners (like Collectr) a clean reference URL during API onboarding.</p>
+    </div>
+
+  </div>
+</body>
+</html>
